@@ -1,32 +1,18 @@
 const {readFile, writeFile} = require('../utils/file');
 const {parseRequest} = require('../utils/requestParser');
 
-const read = (_req, res) => {
-  readFile('./resources/file.txt')
-      .then((content) => {
-        res.write(content);
-        res.end();
-      })
-      .catch((_err) => {
-        res.writeHead(500, {'Content-Type': 'text/html'});
-        res.end();
-      });
+const read = async (_req, res) => {
+  const content = await readFile('./resources/file.txt');
+  res.write(content);
+  res.end();
 };
 
-const write = (req, res) => {
-  parseRequest(req)
-      .then((data) => {
-        const jsonBody = JSON.parse(data);
-        return writeFile('./resources/file.txt', jsonBody.text);
-      })
-      .then(() => {
-        res.writeHead(200, {'Content-Type': 'text/html'});
-        res.end();
-      })
-      .catch((_err)=>{
-        res.writeHead(500, {'Content-Type': 'text/html'});
-        res.end();
-      });
+const write = async (req, res) => {
+  const body = await parseRequest(req);
+  const jsonBody = JSON.parse(body);
+  await writeFile('./resources/file.txt', jsonBody.text);
+  res.writeHead(200, {'Content-Type': 'text/html'});
+  res.end();
 };
 
 module.exports = {
